@@ -1,0 +1,296 @@
+<html>
+  <head>
+    <title>Person Update List</title>
+  </head>
+
+  <style>
+    table {
+      font-family: arial, sans-serif;
+
+      width: 100%;
+      border: 1px solid black;
+    }
+
+    td,
+    th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+
+    body {
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    form {
+      background-color: #dddddd;
+      padding: 20px;
+      border: 1px solid rgb(15, 13, 13);
+    }
+
+    .links {
+      text-decoration: none;
+      color: black;
+    }
+
+    .links:first-child:hover {
+      color: blue;
+    }
+
+    .links:last-child:hover {
+      color: red;
+    }
+
+    #submitBtn:hover {
+      background-color: rgb(87, 209, 81);
+    }
+
+    #updateBtn:enabled:hover {
+      background-color: rgb(233, 228, 80);
+    }
+
+    #resetButton {
+      margin-right: 5%;
+    }
+
+    #resetButton:hover {
+      background-color: rgb(253, 30, 30);
+    }
+
+    .age-input {
+      margin-left: 3.5%;
+    }
+
+    select {
+      margin-left: 4%;
+      padding-right: 24.5%;
+    }
+
+    @media only screen and (max-width: 768px) {
+      body {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+      }
+    }
+  </style>
+
+  <body>
+    <div>
+      <h1 style="font-family: Arial, Helvetica, sans-serif">List of Persons</h1>
+      <table id="myTable">
+        <tr>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Age</th>
+          <th>City</th>
+          <th>Action</th>
+        </tr>
+      </table>
+    </div>
+
+    <div class="form-right">
+      <h1 style="font-family: Arial, Helvetica, sans-serif">
+        Add/Update Person Form
+      </h1>
+      <form
+        id="registration_form"
+        action="handler.php"
+        method="GET"
+        enctype="multipart/form-data"
+      >
+        <strong>Name </strong
+        ><input type="text" name="first_name" id="name" autocomplete="off" />
+        <br />
+
+        <br />
+        <strong>Gender </strong>
+        <input type="radio" name="gender" value="Male" id="male" /><strong
+          >Male</strong
+        >
+        <input type="radio" name="gender" value="Female" id="female" /><strong
+          >Female</strong
+        >
+        <br />
+        <br />
+
+        <strong>Age </strong>
+        <input
+          class="age-input"
+          type="number"
+          name="age"
+          id="age"
+          autocomplete="off"
+        />
+        <br />
+
+        <br />
+        <strong>City </strong>
+        <select name="city" id="city">
+          <option value="Lahore">Lahore</option>
+          <option value="Karachi">Karachi</option>
+          <option value="Islamabad" selected>Islamabad</option>
+        </select>
+        <br />
+        <br />
+        <input type="reset" id="resetButton" value="Reset" />
+        <input type="submit" value="Add" id="submitBtn" onclick="addRow()" />
+        <input id="updateBtn" type="button" value="Update" onclick="" />
+      </form>
+    </div>
+  </body>
+
+  <script>
+    var cells;
+
+    //Disables update button on load
+    window.addEventListener("load", function () {
+      var updateBtn = document.getElementById("updateBtn");
+      updateBtn.disabled = true;
+    });
+
+    //For the form's submit button
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.addEventListener("click", addRow);
+
+    function addRow() {
+      event.preventDefault(); // prevent the default form submission behavior
+
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const city = document.getElementById("city").value;
+
+      const table = document.getElementById("myTable");
+      const newRow = table.insertRow(-1); // insert a new row at the end of the table
+
+      const nameCell = newRow.insertCell(0);
+      const genderCell = newRow.insertCell(1);
+      const ageCell = newRow.insertCell(2);
+      const cityCell = newRow.insertCell(3);
+      const actionsCell = newRow.insertCell(4);
+
+      nameCell.textContent = name;
+      genderCell.textContent = gender;
+      ageCell.textContent = age;
+      cityCell.textContent = city;
+
+      // create the links for the actions cell
+      const updateLink = document.createElement("a");
+      updateLink.textContent = "Update";
+      updateLink.href = "#";
+      updateLink.className = "links";
+
+      // Handles the Update link on Table rows. Disables the add button and enables the update
+      // button. Populates the form with data from respective row
+      updateLink.addEventListener("click", function () {
+        var table = document.getElementById("myTable");
+        var row = table.closest("tr");
+
+        event.preventDefault();
+        var row = this.parentNode.parentNode; // Get the row
+        cells = row.getElementsByTagName("td"); // Get the cells in the row
+        document.getElementById("name").value = cells[0].textContent; // Set the value of the name field
+
+        var gender = cells[1].textContent.toLowerCase();
+        if (gender === "male") {
+          document.getElementById("male").checked = true;
+        } else if (gender === "female") {
+          document.getElementById("female").checked = true;
+        }
+
+        document.getElementById("age").value = cells[2].textContent;
+        document.getElementById("city").value = cells[3].textContent;
+
+        //Enabling update button and disabling add button
+        var updateBtn = document.getElementById("updateBtn");
+        updateBtn.disabled = false;
+        var submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+      });
+
+      const separator = document.createTextNode(" / ");
+
+      const removeLink = document.createElement("a");
+      removeLink.textContent = "Remove";
+      removeLink.href = "#";
+      removeLink.className = "links";
+      removeLink.addEventListener("click", function (event) {
+        var table = document.getElementById("myTable");
+        var row = table.closest("tr");
+        event.preventDefault();
+        var row = this.parentNode.parentNode;
+        row.remove();
+
+        const form = document.getElementById("registration_form");
+        event.preventDefault(); // prevent the default form submission behavior
+        form.reset(); // reset the form
+
+        var updateBtn = document.getElementById("updateBtn");
+        updateBtn.disabled = true;
+
+        var submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = false;
+      });
+
+      // add the links to the actions cell
+      actionsCell.appendChild(updateLink);
+      actionsCell.appendChild(separator);
+      actionsCell.appendChild(removeLink);
+
+      const form = document.getElementById("registration_form");
+      event.preventDefault(); // prevent the default form submission behavior
+      form.reset(); // reset the form after adding a new row
+
+      const updateButton = document.getElementById("updateBtn");
+      updateButton.addEventListener("click", function () {
+        let table = document.getElementById("myTable");
+
+        // Add an event listener to each row
+
+        const name = document.getElementById("name").value;
+        const age = document.getElementById("age").value;
+        const gender = document.querySelector(
+          'input[name="gender"]:checked'
+        ).value;
+        const city = document.getElementById("city").value;
+
+        cells[0].textContent = name;
+        cells[1].textContent = gender;
+        cells[2].textContent = age;
+        cells[3].textContent = city;
+
+        updateButton.disabled = true;
+
+        var submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = false;
+
+        const form = document.getElementById("registration_form");
+        event.preventDefault(); // prevent the default form submission behavior
+        form.reset(); // reset the form
+      });
+    }
+
+    // Handles the reset button. Values are reset on triggering.
+
+    const resetButton = document.getElementById("resetButton");
+    resetButton.addEventListener("click", function (event) {
+      const form = document.getElementById("registration_form");
+      event.preventDefault(); // prevent the default form submission behavior
+      form.reset(); // reset the form
+
+      var updateBtn = document.getElementById("updateBtn");
+      updateBtn.disabled = true;
+
+      var submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = false;
+    });
+
+    
+  </script>
+</html>
